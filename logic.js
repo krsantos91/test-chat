@@ -39,7 +39,7 @@ database.ref().on("value", function(snapshot) {
 
 
     // change the HTML to reflect the newly updated local values (most recent information from firebase)
-    $("#chatbox").html("<h3>" + currentName + ": " + currentMessage + "</h3>");
+    $("#chatbox").append("<h3>" + currentName + ": " + currentMessage + "</h3>");
 
 
   }
@@ -47,7 +47,7 @@ database.ref().on("value", function(snapshot) {
   // Else Firebase doesn't have a highPrice/highBidder, so use the initial local values.
   else {
     // Change the HTML to reflect the local value in firebase
-    $("#chatbox").html("<h3>" + currentName + ": " + currentMessage + "</h3>");
+    $("#chatbox").append("<h3>" + currentName + ": " + currentMessage + "</h3>");
   }
 
 
@@ -63,9 +63,9 @@ $("#submit-message").on("click", function(event) {
   event.preventDefault();
   currentMessage = $("#message").val().trim();
   currentName = $("#name").val().trim();
+  $("#message").val("");
   database.ref().set({
     name: currentName,
     message: currentMessage
   })
-    $("#chatbox").html("<h3>" + currentName + ": " + currentMessage + "</h3>");
 });
