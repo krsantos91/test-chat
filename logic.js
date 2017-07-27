@@ -66,6 +66,7 @@ $("#submit-message").on("click", function(event) {
     name: username,
     message: currentMessage
   })
+  $("#message").focus();
 });
 
 function scrollSmoothToBottom (id) {
