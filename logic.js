@@ -35,12 +35,12 @@ database.ref().on("value", function(snapshot) {
     currentMessage = snapshot.val().message;
     currentName = snapshot.val().name;
     // change the HTML to reflect the newly updated local values (most recent information from firebase)
-    $("#chatbox").append("<h3>" + currentName + ": " + currentMessage + "</h3>");
+    $("#chatbox").append("<h3>" + currentName.toUpperCase() + ": " + currentMessage + "</h3>");
   }
   // Else Firebase doesn't have a highPrice/highBidder, so use the initial local values.
   else {
     // Change the HTML to reflect the local value in firebase
-    $("#chatbox").append("<h3>" + currentName + ": " + currentMessage + "</h3>");
+    $("#chatbox").append("<h3>" + currentName.toUpperCase() + ": " + currentMessage + "</h3>");
   }
   scrollSmoothToBottom("convo");
 
