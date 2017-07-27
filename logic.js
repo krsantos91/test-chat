@@ -21,6 +21,8 @@ var initialname = "";
 var initialmessage = "";
 var currentName = initialname;
 var currentMessage = initialmessage;
+var username = "";
+var ignore = false;
 
 // --------------------------------------------------------------
 
@@ -29,26 +31,18 @@ var currentMessage = initialmessage;
 database.ref().on("value", function(snapshot) {
 
   // If Firebase has a highPrice and highBidder stored (first case)
-  if (snapshot.child("name").exists() && snapshot.child("message").exists()) {
-
-    // Set the local variables for highBidder equal to the stored values in firebase.
-    // highPrice = ...
-    // highBidder = ...
+  if (snapshot.child("name").exists() && snapshot.child("message").exists()){
     currentMessage = snapshot.val().message;
     currentName = snapshot.val().name;
-
-
     // change the HTML to reflect the newly updated local values (most recent information from firebase)
     $("#chatbox").append("<h3>" + currentName + ": " + currentMessage + "</h3>");
-
-
   }
-
   // Else Firebase doesn't have a highPrice/highBidder, so use the initial local values.
   else {
     // Change the HTML to reflect the local value in firebase
     $("#chatbox").append("<h3>" + currentName + ": " + currentMessage + "</h3>");
   }
+  scrollSmoothToBottom("convo");
 
 
 // If any errors are experienced, log them to console.
@@ -62,10 +56,21 @@ database.ref().on("value", function(snapshot) {
 $("#submit-message").on("click", function(event) {
   event.preventDefault();
   currentMessage = $("#message").val().trim();
-  currentName = $("#name").val().trim();
+  if(ignore == false){
+    username = $("#name").val().trim()
+    ignore = true;
+  };
+  $("#name-form").remove();
   $("#message").val("");
   database.ref().set({
-    name: currentName,
+    name: username,
     message: currentMessage
   })
 });
+
+function scrollSmoothToBottom (id) {
+   var div = document.getElementById(id);
+   $('#' + id).animate({
+      scrollTop: div.scrollHeight - div.clientHeight
+   }, 500);
+}
