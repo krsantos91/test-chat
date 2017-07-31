@@ -55,7 +55,7 @@ function loadChat(){
         $("#chatbox").append("<h3>" + currentName.toUpperCase() + ": " + currentMessage + "</h3>");      
       }
     }
-    scrollSmoothToBottom("convo");
+    scrollSmoothToBottom("chatbox");
   }, function(errorObject) {
     console.log("The read failed: " + errorObject.code);
   });
