@@ -1,6 +1,3 @@
-// Initialize Firebase
-// Make sure to match the configuration to the script version number in the HTML
-// (Ex. 3.0 != 3.7.0)
   var config = {
     apiKey: "AIzaSyBswMwyD7IWpaSv2NuQD5uscHK4YeEjM8s",
     authDomain: "ks-firebase-app1.firebaseapp.com",
@@ -15,59 +12,86 @@
 // Assign the reference to the database to a variable named 'database'
 var database = firebase.database();
 
-
-// Initial Values
 var initialname = "";
 var initialmessage = "";
 var currentName = initialname;
 var currentMessage = initialmessage;
 var username = "";
 var ignore = false;
+var name = "";
 
-// --------------------------------------------------------------
+//When creating a New Chatroom
+$("#SubmitNewChat").on("click", function(event){
+  event.preventDefault;
+  name = $("#GroupName").val().trim();
+  database.ref(name+'/chat').set({
+    LatestName: "",
+    LatestMessage: ""
+  })
+  // database.ref(name+'/users').set({
+  //   Users:""
+  // })  
+  $("#StartUp").remove();
+  $("#Main").removeClass("hide");
+  loadChat();
+})
+$("#SubmitExistingChat").on("click", function(event){
+  event.preventDefault;
+  name = $("#GroupName").val().trim();
+  $("#StartUp").remove();
+  $("#Main").removeClass("hide");
+  loadChat();
+})
 
-// At the initial load and subsequent value changes, get a snapshot of the local data.
-// This function allows you to update your page in real-time when the firebase database changes.
-database.ref().on("value", function(snapshot) {
 
-  // If Firebase has a highPrice and highBidder stored (first case)
-  if (snapshot.child("name").exists() && snapshot.child("message").exists()){
-    currentMessage = snapshot.val().message;
-    currentName = snapshot.val().name;
-    // change the HTML to reflect the newly updated local values (most recent information from firebase)
-    $("#chatbox").append("<h3>" + currentName.toUpperCase() + ": " + currentMessage + "</h3>");
-  }
-  // Else Firebase doesn't have a highPrice/highBidder, so use the initial local values.
-  else {
-    // Change the HTML to reflect the local value in firebase
-    $("#chatbox").append("<h3>" + currentName.toUpperCase() + ": " + currentMessage + "</h3>");
-  }
-  scrollSmoothToBottom("convo");
+// print initial values to chatbox or print new values to chatbox
+function loadChat(){
+  $("#ChatTitle").text("Chatroom: " + name);
+  database.ref(name+'/chat').on("value", function(snapshot) {
+    if (snapshot.child("LatestName").exists() && snapshot.child("LatestMessage").exists()){
+      currentMessage = snapshot.val().LatestMessage;
+      currentName = snapshot.val().LatestName;
+      if (currentMessage != ""){
+        $("#chatbox").append("<h3>" + currentName.toUpperCase() + ": " + currentMessage + "</h3>");      
+      }
+    }
+    scrollSmoothToBottom("convo");
+  }, function(errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });
+  database.ref(name+'/users').on("child_added", function(snapshot) {
+    $("#UserList").append('<div class="row"><span class="glyphicon glyphicon-ok" style="font-size:12px;color:green"></span> '+ snapshot.val() + '</div>');
+  }, function(errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });  
+}
 
 
-// If any errors are experienced, log them to console.
-}, function(errorObject) {
-  console.log("The read failed: " + errorObject.code);
-});
 
-// --------------------------------------------------------------
-
-// Whenever a user clicks the submit-bid button
 $("#submit-message").on("click", function(event) {
   event.preventDefault();
   currentMessage = $("#message").val().trim();
+  console.log(currentMessage);
   if(ignore == false){
     username = $("#name").val().trim()
-    ignore = true;
+    if(username === ""){
+      alert("Username cannot be blank");
+      return;
+    }
+    else{
+      ignore = true;  
+      database.ref(name+'/users').push(username);      
+    }
   };
   $("#name-form").remove();
   $("#message").val("");
-  database.ref().set({
-    name: username,
-    message: currentMessage
+  database.ref(name+'/chat').set({
+    LatestName: username,
+    LatestMessage: currentMessage
   })
   $("#message").focus();
 });
+
 
 function scrollSmoothToBottom (id) {
    var div = document.getElementById(id);
