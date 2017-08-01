@@ -18,56 +18,67 @@ var currentName = initialname;
 var currentMessage = initialmessage;
 var username = "";
 var ignore = false;
+var ignore2 = false;
 var name = "";
+var sitekey = "";
 
 //When creating a New Chatroom
 $("#SubmitNewChat").on("click", function(event){
   event.preventDefault;
-  name = $("#GroupName").val().trim();
-  database.ref(name+'/chat').set({
+  name = $("#NewChat").val().trim();
+  sitekey = keyGen();
+  database.ref(sitekey+'/chat').set({
     LatestName: "",
-    LatestMessage: ""
+    LatestMessage: "",
+    Chatname: name
   })
-  // database.ref(name+'/users').set({
-  //   Users:""
-  // })  
-  $("#StartUp").remove();
-  $("#Main").removeClass("hide");
-  loadChat();
+  loadNewChat();
 })
 $("#SubmitExistingChat").on("click", function(event){
   event.preventDefault;
-  name = $("#GroupName").val().trim();
-  $("#StartUp").remove();
-  $("#Main").removeClass("hide");
-  loadChat();
+  sitekey = $("#ExistingChat").val().trim();
+  loadExistingChat();
 })
 
-
-// print initial values to chatbox or print new values to chatbox
-function loadChat(){
-  $("#ChatTitle").text("Chatroom: " + name);
-  database.ref(name+'/chat').on("value", function(snapshot) {
+function loadNewChat(){
+  $("#StartUp").remove();
+  $("#Main").removeClass("hide");
+  database.ref(sitekey+'/chat').on("value", function(snapshot) {
     if (snapshot.child("LatestName").exists() && snapshot.child("LatestMessage").exists()){
+      $("#ChatTitle").text("Chatroom: " + snapshot.child("Chatname").val())
+      $("#ChatTitle").append('<h5>The sitekey for this chat is: <strong>' + sitekey +'</strong></h5>')
       currentMessage = snapshot.val().LatestMessage;
       currentName = snapshot.val().LatestName;
       if (currentMessage != ""){
-        $("#chatbox").append("<h3>" + currentName.toUpperCase() + ": " + currentMessage + "</h3>");      
+        $("#chatbox").append("<h4>" + currentName.toUpperCase() + ": " + currentMessage + "</h4>");      
       }
     }
     scrollSmoothToBottom("chatbox");
   }, function(errorObject) {
     console.log("The read failed: " + errorObject.code);
   });
-  database.ref(name+'/users').on("child_added", function(snapshot) {
+  database.ref(sitekey+'/users').on("child_added", function(snapshot) {
     $("#UserList").append('<div class="row"><span class="glyphicon glyphicon-ok" style="font-size:12px;color:green"></span> '+ snapshot.val() + '</div>');
   }, function(errorObject) {
     console.log("The read failed: " + errorObject.code);
   });  
 }
 
-
-
+function loadExistingChat(){
+  database.ref(sitekey).on("value",function(snapshot){
+    if(snapshot.exists() === false){
+      alert("This chatroom doesn't exist. Please try again");
+      $("#ExistingChat").val("");
+      $("#ExistingChat").focus();
+    }
+    else{
+      if (ignore2 === false){
+        loadNewChat();        
+      }
+      ignore2 = true;
+    };
+  });
+}
 $("#submit-message").on("click", function(event) {
   event.preventDefault();
   currentMessage = $("#message").val().trim();
@@ -80,14 +91,15 @@ $("#submit-message").on("click", function(event) {
     }
     else{
       ignore = true;  
-      database.ref(name+'/users').push(username);      
+      database.ref(sitekey+'/users').push(username);      
     }
   };
   $("#name-form").remove();
   $("#message").val("");
-  database.ref(name+'/chat').set({
+  database.ref(sitekey+'/chat').set({
     LatestName: username,
-    LatestMessage: currentMessage
+    LatestMessage: currentMessage,
+    Chatname:name
   })
   $("#message").focus();
 });
@@ -98,4 +110,16 @@ function scrollSmoothToBottom (id) {
    $('#' + id).animate({
       scrollTop: div.scrollHeight - div.clientHeight
    }, 500);
+}
+
+//keygen File
+function keyGen(){
+  var length = 10;
+  var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+  var key = '';
+  for (let i = 0; i < length; i++) {
+      key += chars[Math.floor(Math.random() * chars.length)];
+  }
+  console.log(chars);
+  return key;
 }

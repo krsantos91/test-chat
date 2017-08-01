@@ -22,16 +22,22 @@
 <div class="container" id="StartUp" style="margin-top:100px">
   <div class="col-sm-3"></div>
   <div class="col-sm-6">
-    <div class="jumbotron">
+    <div class="jumbotron" style="text-align:center">
       <div class="row">
-        <h3><b>Enter an Exiting Chatroom Name or Create a New One!</b></h3>
+        <h3><b>Welcome to QuickChat!</b></h3>
       </div>
       <div class="row">
-        <div class="form-group">                            
-            <input class="form-control" id="GroupName" type="text" placeholder="Enter your chatroom name (Case sensitive)">
-            <button class="btn btn-success" id="SubmitNewChat" type="submit">Create a New Chat</button>
-            <button class="btn btn-primary" id="SubmitExistingChat" type="submit">Join an Existing Chat</button>           
-        </div>         
+        <div class="form-group">
+            <label for="NewChat">Create a new chatroom for others to join</label>                            
+            <input class="form-control" id="NewChat" type="text" placeholder="Please enter a name for your chatroom" style="margin-bottom:3px">
+            <button class="btn btn-success" id="SubmitNewChat" type="submit">Create a New Chat</button>         
+        </div>   
+        <h4>Or</h4>
+        <div class="form-group">
+            <label for="ExistingChat">Enter the 10 digift alphanumeric sitekey for an existing chat</label>
+            <input type="text" class="form-control" id="ExistingChat" placeholder="e.g. upHcpS0PMq" style="margin-bottom:3px">
+            <button class="btn btn-primary" id="SubmitExistingChat" tyep="submit">Join an Existing Chat</button>
+        </div>      
       </div>      
     </div>
   </div>
@@ -81,9 +87,8 @@
   </div>
       
 </div>
-
-    <!-- JavaScript -->
-    <script src="logic.js"></script>
+<!-- JavaScript -->
+<script src="logic.js"></script>
 
 </body>
 
